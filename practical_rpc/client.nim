@@ -22,7 +22,6 @@ template make_request*(self: RpcClient, url, payload: string,
   let response {.inject.} = self.client.request(url, httpMethod = HttpPost,
     body = payload)
 
-  echo "Received " & url
   callback
 
 proc add*[T](j: JsonNode, s: string, i: T) =
@@ -50,10 +49,13 @@ proc def_rpc_client_call*(client_name, method_name, url: string,
     template `proc_name`(self: `self`, payload: `req`,
         callback: untyped) =
       var str_payload = $`rmarshal`(payload)
-      self.make_request(self.url & `mn`, str_payload):
+      var u = self.url & `mn`
+      self.make_request(u, str_payload):
         response.add_callback(
           proc () =
-          var body = parse_json(response.read.body.read)
+          var r = response.read
+          var body = parse_json(r.body.read)
+          echo "Received " & u & " -> " & $code(r)
           var res {.inject.}: `res`
           `runmarshal`(body, addr(res))
           callback

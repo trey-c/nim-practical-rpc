@@ -6,7 +6,7 @@
 import macros, json, algorithm, asynchttpserver
 import ./client
 
-export HttpCode
+export HttpCode, Http200, Http201, Http404, Http406
 
 type
   RpcService* = ref object of RootObj
@@ -16,7 +16,7 @@ type
 method init*(self: RpcService) {.base.} =
   echo("Override me - init")
 
-method call_rpc*(self: RpcService, name: string, payload: JsonNode): string {.base.} =
+method call_rpc*(self: RpcService, name: string, payload: JsonNode): CallRpc {.base.} =
   echo("Override me - call_rpc")
 
 proc marshal_tup(stmt_list, tup, iresult, x: NimNode) =
