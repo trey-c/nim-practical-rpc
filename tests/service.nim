@@ -11,24 +11,28 @@ rpc_service "MockService", "/mock":
   max: int
 
   rpc_proc "test_one":
-    request:
+    request: tuple [
       name: string
-    response:
+    ]
+    response: tuple [
       greeting: string
+    ]
   do:
     result.greeting = "Hello, " & request.name
     code = Http200
 
   rpc_proc "test_two":
-    request:
-      id: int
-      name: string
+    request: tuple [
+      id: int,
+      name: string,
       age: int
-    response:
-      id: int
+    ]
+    response: tuple [
+      id: int,
       person: tuple[
         name: string,
         age: int
+        ]
       ]
   do:
     result.id = request.id
@@ -36,13 +40,15 @@ rpc_service "MockService", "/mock":
     code = Http200
 
   rpc_proc "test_three":
-    request:
+    request: tuple [
       wanted_age: int
-    response:
+    ]
+    response: tuple [
       people_List: seq[tuple[
         name: string,
         age: int
       ]]
+    ]
   do:
     for i in self.count..self.max:
       result.people_list.add((name: "Testers", age: request.wanted_age))

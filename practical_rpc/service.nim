@@ -268,24 +268,6 @@ proc call_rpc_def(service: string, proc_table: seq[tuple[name: string,
     call
   )
 
-proc rpc_tuple_def(calls: NimNode): NimNode =
-  result = nnkTupleTy.new_tree()
-
-  for call in calls:
-    var t: NimNode
-
-    if call[1][0].kind == nnkTupleTy or call[1][0].kind == nnkBracketExpr:
-      t = call[1][0]
-    else:
-      t = new_ident_node(call[1][0].str_val)
-
-    result.add(
-      nnkIdentDefs.new_tree(
-      new_ident_node(call[0].str_val),
-      t,
-      new_empty_node(),
-    ))
-
 proc rpc_proc_def(name, service: string, request_tuple, response_tuple,
     call: NimNode): NimNode =
   result = nnkProcDef.new_tree(
@@ -360,8 +342,8 @@ macro rpc_service*(name: string, path: string, body: untyped): untyped =
   for node in body:
     if node.kind == nnkCommand:
       var
-        request_tuple = rpc_tuple_def(node[2][0][1])
-        response_tuple = rpc_tuple_def(node[2][1][1])
+        request_tuple = node[2][0][1][0]
+        response_tuple = node[2][1][1][0]
 
       if tup_list.contains(request_tuple) == false:
         req_marshal.add(rpc_marshal_def(request_tuple, name.str_val))
